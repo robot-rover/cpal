@@ -111,7 +111,7 @@ impl Device {
                 sample_rate: crate::SampleRate,
                 from_endianness: F,
             ) where
-                A: AsioSample,
+                A: AsioSample + std::fmt::Debug + std::cmp::PartialOrd,
                 B: Sample,
                 D: FnMut(&Data, &InputCallbackInfo) + Send + 'static,
                 F: Fn(A) -> A,
@@ -123,6 +123,7 @@ impl Device {
                 let buffer_index = asio_info.buffer_index as usize;
                 for ch_ix in 0..n_channels {
                     let asio_channel = asio_channel_slice::<A>(asio_stream, buffer_index, ch_ix);
+                    println!("{:?}", &asio_channel.iter().max_by(|a, b| a.partial_cmp(b).unwrap()));
                     for (frame, s_asio) in interleaved.chunks_mut(n_channels).zip(asio_channel) {
                         frame[ch_ix] = from_endianness(*s_asio).to_cpal_sample();
                     }

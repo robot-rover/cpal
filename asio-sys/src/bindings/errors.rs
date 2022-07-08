@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt;
+use std::fmt::Formatter;
 
 /// Errors that might occur during `Asio::load_driver`.
 #[derive(Debug)]
@@ -37,12 +38,6 @@ pub enum AsioErrorWrapper {
     Invalid,
 }
 
-impl fmt::Display for LoadDriverError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.description())
-    }
-}
-
 impl fmt::Display for AsioError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
@@ -70,17 +65,18 @@ impl fmt::Display for AsioError {
     }
 }
 
-impl Error for LoadDriverError {
-    fn description(&self) -> &str {
+impl fmt::Display for LoadDriverError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match *self {
             LoadDriverError::LoadDriverFailed => {
-                "ASIO `loadDriver` function returned `false` indicating failure"
+                write!(f, "ASIO `loadDriver` function returned `false` indicating failure")?
             }
-            LoadDriverError::InitializationFailed(ref err) => err.description(),
+            LoadDriverError::InitializationFailed(ref err) => write!(f, "{}", err)?,
             LoadDriverError::DriverAlreadyExists => {
-                "ASIO only supports loading one driver at a time"
+                write!(f, "ASIO only supports loading one driver at a time")?
             }
         }
+        Ok(())
     }
 }
 

@@ -957,6 +957,7 @@ extern "C" fn buffer_switch_time_info(
         buffer_index: double_buffer_index,
         system_time: asio_time.time_info.system_time,
     };
+
     for &mut (_, ref mut bc) in bcs.iter_mut() {
         bc.run(&callback_info);
     }
